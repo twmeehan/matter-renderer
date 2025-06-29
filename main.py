@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException, Query, Response, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import numpy as np
 from pathlib import Path
 from plyfile import PlyData
 import trimesh
+import re
 
 
 app = FastAPI()
@@ -13,7 +14,9 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-MODELS_DIR = Path("../matter/output/collapse")
+OUTPUT_DIR = Path("../matter/output")
+pattern = re.compile(r"particles_f\d+\.ply")
+
 
 @app.get("/", response_class=HTMLResponse)
 def serve_index(request: Request):
@@ -21,7 +24,8 @@ def serve_index(request: Request):
 
 @app.get("/model")
 def convert(name: str = Query(..., description="Name of the .ply file without extension")):
-    ply_path = MODELS_DIR / f"{name}.ply"
+    ply_path = OUTPUT_DIR / f"{name}"
+    print(ply_path)
     if not ply_path.exists():
         raise HTTPException(status_code=404, detail="PLY file not found")
 
@@ -37,6 +41,16 @@ def convert(name: str = Query(..., description="Name of the .ply file without ex
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/animation")
+def list_animation_frames(name: str):
+    folder = OUTPUT_DIR / name
+    if not folder.exists():
+        return JSONResponse(status_code=404, content={"error": "Folder not found"})
+
+    matching_files = sorted(
+        [f.name for f in folder.glob("particles_f*.ply") if pattern.match(f.name)]
+    )
+    return {"frames": matching_files}
 
 def convert_ply_to_obj_memory(ply_path: Path) -> bytes:
     try:
