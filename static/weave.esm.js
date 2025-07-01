@@ -2111,6 +2111,11 @@ const WEAVE = {
       const isBillboard = obj.mesh instanceof BillboardMesh;
       const program = isBillboard ? this.billboardProgram : this.program;
       
+      if (isBillboard) {
+        gl.depthMask(false);
+      } else {
+        gl.depthMask(true);
+      }
       gl.useProgram(program);
       
       let modelMat = obj.getWorldMatrix();

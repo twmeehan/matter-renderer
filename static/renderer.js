@@ -46,11 +46,14 @@ document.addEventListener("keydown", e => {
   });
 
 async function loadModel(name) {
-    return await WEAVE.Loader.loadParticleSystem(`/model?name=${encodeURIComponent(folderName)}/${encodeURIComponent(name)}`,'/static/texture.png',0.02);
+    const sizeValue = Number(document.getElementById("size").value) ? Number(document.getElementById("size").value) : 0;
+    return await WEAVE.Loader.loadParticleSystem(`/model?name=${encodeURIComponent(folderName)}/${encodeURIComponent(name)}`,'/static/texture.png',sizeValue > 0 ? 0.01*sizeValue : 0.01);
 }
 
 export async function loadAnimation() {
+
     animationFrames = []
+
     folderName = document.getElementById("modelName").value;
     let response = await fetch(`/animation?name=${encodeURIComponent(folderName)}`);
 
@@ -88,4 +91,4 @@ setInterval(() => {
 
     // Advance and wrap
     currentFrame = (currentFrame + 1) % animationFrames.length;
-}, 1000 / 10);
+}, 1000 / 30);
