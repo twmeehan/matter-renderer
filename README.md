@@ -52,6 +52,9 @@ Run cmake and the make in the base directory to build the executable. Then run t
 Go to matter-renderer directory and run 
 
 ```source matter-renderer-env/bin/activate```
+
+and 
+
 ```python3 main.py &```
 
 Open the browser on your local machine to localhost:8080. It should show a 3d enviroment and a header saying OBJ loader.
