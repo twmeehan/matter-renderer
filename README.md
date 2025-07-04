@@ -8,7 +8,8 @@ ssh into remote machine using
 
 then download these repos
 
-https://github.com/larsblatny/matter/
+https://github.com/twmeehan/matter-tests
+https://github.com/twmeehan/matter-renderer
 
 These must be in the same root directory like
 

@@ -35,15 +35,15 @@ let box = new WEAVE.Box();
 box.scale = new Vec3(5,0.01,5);
 box.mesh.material = new WEAVE.Material(new Vec3(0.5,0.5,0.5),new Vec3(0,1,0),new Vec3(0,0,1),10);
 
+
+let box2 = new WEAVE.Box()
+box2.scale = new Vec3(0.4,0.4,0.4)
+box2.position = new Vec3(0,1,0)
+box2.rotation = new Vec3(0,0,Math.PI/4)
 // Call start to begin the program loop
 WEAVE.start();
 
 let animationFrames = [];
-document.addEventListener("keydown", e => {
-    if (e.key === "d") {
-      WEAVE.toggleDebugWindow(WEAVE.scene);
-    }
-  });
 
 async function loadModel(name) {
     const sizeValue = Number(document.getElementById("size").value) ? Number(document.getElementById("size").value) : 0;
