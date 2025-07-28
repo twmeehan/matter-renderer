@@ -23,11 +23,31 @@ def serve_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/model")
-def convert(name: str = Query(..., description="Name of the .ply file without extension")):
-    ply_path = OUTPUT_DIR / f"{name}"
-    print(ply_path)
+def serve_or_convert_model(name: str = Query(..., description="Name of the .ply or .obj file")):
+    if name.endswith(".obj"):
+        obj_path = OUTPUT_DIR / name
+        if not obj_path.exists():
+            raise HTTPException(status_code=404, detail="OBJ file not found")
+        return FileResponse(
+            path=obj_path,
+            media_type="text/plain",
+            filename=name
+        )
+
+    ply_path = OUTPUT_DIR / name
     if not ply_path.exists():
         raise HTTPException(status_code=404, detail="PLY file not found")
+
+    obj_name = Path(name).with_suffix(".obj").name
+    obj_path = OUTPUT_DIR / obj_name
+
+    # If already converted, just return it
+    if obj_path.exists():
+        return FileResponse(
+            path=obj_path,
+            media_type="text/plain",
+            filename=obj_name
+        )
 
     try:
         obj_bytes = convert_ply_to_obj_memory(ply_path)
@@ -35,7 +55,7 @@ def convert(name: str = Query(..., description="Name of the .ply file without ex
             content=obj_bytes,
             media_type="text/plain",
             headers={
-                "Content-Disposition": f"attachment; filename={name}.obj"
+                "Content-Disposition": f"attachment; filename={obj_name}"
             }
         )
     except RuntimeError as e:
@@ -47,8 +67,10 @@ def list_animation_frames(name: str):
     if not folder.exists():
         return JSONResponse(status_code=404, content={"error": "Folder not found"})
 
+    pattern = re.compile(r"particles_f\d+\.(ply|obj)")
+
     matching_files = sorted(
-        [f.name for f in folder.glob("particles_f*.ply") if pattern.match(f.name)]
+        [f.name for f in folder.iterdir() if pattern.match(f.name)]
     )
     return {"frames": matching_files}
 

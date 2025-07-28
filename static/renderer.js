@@ -37,8 +37,8 @@ box.mesh.material = new WEAVE.Material(new Vec3(0.5,0.5,0.5),new Vec3(0,1,0),new
 
 
 let box2 = new WEAVE.Box()
-box2.scale = new Vec3(0.4,0.4,0.4)
-box2.position = new Vec3(0,1,0)
+box2.scale = new Vec3(0.1,0.1,0.1)
+box2.position = new Vec3(0.5,0.4,0.5)
 box2.rotation = new Vec3(0,0,Math.PI/4)
 // Call start to begin the program loop
 WEAVE.start();
